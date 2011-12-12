@@ -1,6 +1,8 @@
 package com.stkiller.hibexample.dal.entities;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,8 +23,8 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Embedded
-    private Address address;
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.ALL})
+    private Set<Address> addresses = new HashSet<Address> ();
 
     public User() {
         
@@ -53,12 +55,19 @@ public class User {
         this.password = password;
     }
 
-    public Address getAddress() {
-        return address;
+    public Set<Address> getAddresses() {
+        return addresses;
     }
 
-    public void setAddress(Address address) {
-        this.address = address;
+    public void setAddresses(Set<Address> addresses) {
+        for (Address address : addresses) {
+            this.addAddress(address);
+        }
+    }
+
+    public void addAddress(Address address) {
+        address.setUser(this);
+        this.getAddresses().add(address);
     }
 
     @Override
@@ -67,7 +76,7 @@ public class User {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", password='" + password + '\'' +
-                ", address=" + address +
+                ", addresses=" + addresses +
                 '}';
     }
 }
